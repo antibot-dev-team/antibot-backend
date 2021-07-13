@@ -1,4 +1,6 @@
 # Antibot Backend
+## Requirements
+ - Go (tested on 1.16.5)
 
 ## Usage
 Run:  
