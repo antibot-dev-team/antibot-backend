@@ -1,11 +1,12 @@
 package http
 
 import (
-	"github.com/antibot-dev-team/antibot-backend/antibot"
-	"github.com/antibot-dev-team/antibot-backend/internal/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/valyala/fasthttp"
+
+	"github.com/antibot-dev-team/antibot-backend/antibot"
+	"github.com/antibot-dev-team/antibot-backend/internal/web"
 )
 
 type AntibotHandlers struct {
@@ -14,21 +15,21 @@ type AntibotHandlers struct {
 	Logger  *logrus.Logger
 }
 
-type status struct {
+type analyzeResponse struct {
 	Status string `json:"status"`
 	Data   string `json:"data"`
 }
 
-type data struct {
+type analyzeRequest struct {
 	Data string `json:"data"`
 }
 
 func (a *AntibotHandlers) Analyze(ctx *fasthttp.RequestCtx) error {
-	var requestBody data
-	if err := web.DecodeBody(ctx, &requestBody); err != nil {
-		return errors.Wrap(err, "Unknown data")
+	var requestBody analyzeRequest
+	if err := web.DecodeJSON(ctx, &requestBody); err != nil {
+		return errors.Wrap(err, "undefined data structure")
 	}
-	return web.Respond(ctx, status{
+	return web.RespondJSON(ctx, analyzeResponse{
 		Status: "success",
 		Data:   requestBody.Data,
 	}, fasthttp.StatusOK)

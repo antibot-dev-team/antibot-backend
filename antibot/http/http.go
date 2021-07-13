@@ -1,12 +1,15 @@
 package http
 
 import (
+	"os"
+
+	cors "github.com/AdhityaRamadhanus/fasthttpcors"
+	"github.com/sirupsen/logrus"
+	"github.com/valyala/fasthttp"
+
 	"github.com/antibot-dev-team/antibot-backend/antibot"
 	"github.com/antibot-dev-team/antibot-backend/internal/middlewares"
 	"github.com/antibot-dev-team/antibot-backend/internal/web"
-	"github.com/sirupsen/logrus"
-	"github.com/valyala/fasthttp"
-	"os"
 )
 
 func HandleAPI(version string,
@@ -22,7 +25,16 @@ func HandleAPI(version string,
 		Logger:  logger,
 	}
 
-	app.Handle(fasthttp.MethodPost, "/v1/analyze", antibotHandlers.Analyze)
+	app.Handle(fasthttp.MethodPost, "/api/v1/analyze", antibotHandlers.Analyze)
 
-	return app.Handler()
+	withCors := cors.NewCorsHandler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedHeaders:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST"},
+		AllowCredentials: false,
+		AllowMaxAge:      5600,
+		Debug:            false,
+	})
+
+	return withCors.CorsMiddleware(app.Handler())
 }

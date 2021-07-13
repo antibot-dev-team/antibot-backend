@@ -3,10 +3,12 @@ package web
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/valyala/fasthttp"
 )
 
-func DecodeBody(ctx *fasthttp.RequestCtx, data interface{}) error {
+// DecodeJSON decodes JSON body and stores it in the data structure
+func DecodeJSON(ctx *fasthttp.RequestCtx, data interface{}) error {
 	requestBody := bytes.NewReader(ctx.PostBody())
 	decoder := json.NewDecoder(requestBody)
 

@@ -1,9 +1,10 @@
 package middlewares
 
 import (
-	"github.com/antibot-dev-team/antibot-backend/internal/web"
 	"github.com/sirupsen/logrus"
 	"github.com/valyala/fasthttp"
+
+	"github.com/antibot-dev-team/antibot-backend/internal/web"
 )
 
 var errorStatus = struct {
@@ -12,6 +13,7 @@ var errorStatus = struct {
 	"unexpected error",
 }
 
+// Errors handles unexpected errors
 func Errors(logger *logrus.Logger) web.Middleware {
 
 	m := func(before web.Handler) web.Handler {
@@ -20,7 +22,7 @@ func Errors(logger *logrus.Logger) web.Middleware {
 			if err := before(ctx); err != nil {
 				logger.Error(err)
 				ctx.ResetBody()
-				return web.Respond(ctx, errorStatus, fasthttp.StatusInternalServerError)
+				return web.RespondJSON(ctx, errorStatus, fasthttp.StatusInternalServerError)
 			}
 
 			return nil
