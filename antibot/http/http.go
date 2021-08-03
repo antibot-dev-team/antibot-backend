@@ -8,6 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"github.com/antibot-dev-team/antibot-backend/antibot"
+	"github.com/antibot-dev-team/antibot-backend/antibot/analyzer"
 	"github.com/antibot-dev-team/antibot-backend/internal/middlewares"
 	"github.com/antibot-dev-team/antibot-backend/internal/web"
 )
@@ -18,11 +19,13 @@ func HandleAPI(version string,
 	cfg *antibot.Config,
 ) fasthttp.RequestHandler {
 	app := web.NewApp(logger, shutdown, middlewares.Errors(logger))
+	browserAnalyzer := analyzer.NewAnalyzer()
 
 	antibotHandlers := AntibotHandlers{
-		Version: version,
-		Cfg:     cfg,
-		Logger:  logger,
+		Version:  version,
+		Cfg:      cfg,
+		Logger:   logger,
+		Analyzer: browserAnalyzer,
 	}
 
 	app.Handle(fasthttp.MethodPost, "/api/v1/analyze", antibotHandlers.Analyze)
