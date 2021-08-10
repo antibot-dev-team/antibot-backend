@@ -1,7 +1,6 @@
 package analyzer
 
 import (
-	"regexp"
 	"strings"
 )
 
@@ -40,8 +39,7 @@ func (a *Analyzer) analyzeLanguages(languages []string) bool {
 func (a *Analyzer) analyzePlugins(plugins []string, ua string) bool {
 
 	// In Firefox-like browsers no plugins can be normal
-	pattern := regexp.MustCompile("Gecko/\\d{8}")
-	isGecko := pattern.FindStringIndex(ua) != nil
+	isGecko := strings.Contains(ua, "Gecko/")
 
 	return isGecko || len(plugins) != 0
 }
