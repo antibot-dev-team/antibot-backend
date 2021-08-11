@@ -7,10 +7,11 @@ import (
 const chromeDriverPrefix = "cdc_"
 
 type ClientProperties struct {
-	Languages []string `json:"languages"`
-	Plugins   []string `json:"plugins"`
-	Window    []string `json:"custom_window"`
-	UserAgent string   `json:"ua"`
+	Languages       []string `json:"languages"`
+	Plugins         []string `json:"plugins"`
+	Window          []string `json:"custom_window"`
+	UserAgent       string   `json:"ua"`
+	HasWindowChrome bool     `json:"has_window_chrome"`
 }
 
 type Analyzer struct{}
@@ -25,7 +26,8 @@ func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 	// TODO: Add more checks here
 	return a.analyzeLanguages(properties.Languages) &&
 		a.analyzePlugins(properties.Plugins, properties.UserAgent) &&
-		a.analyzeWindow(properties.Window)
+		a.analyzeWindow(properties.Window) &&
+		a.analyzeWindowChrome(properties.HasWindowChrome, properties.UserAgent)
 }
 
 // analyzeLanguages checks available languages
@@ -55,4 +57,15 @@ func (a *Analyzer) analyzeWindow(window []string) bool {
 	}
 
 	return true
+}
+
+// analyzeWindowChrome checks if window.chrome is not present but client's browser is Chrome, Chromium or Opera
+// While window.chrome is available in vanilla mode, it’s not available in headless mode.
+func (a *Analyzer) analyzeWindowChrome(hasWindowChrome bool, ua string) bool {
+	// TODO: check if window.chrome is present in Chrome on iOS. If so, check UA for "CriOS" substring.
+
+	isChromeOrOpera := strings.Contains(ua, "Chrome") || strings.Contains(ua, "Chromium")
+	isChromeOrOpera = isChromeOrOpera || strings.Contains(ua, "Opera") || strings.Contains(ua, "OPR")
+
+	return !isChromeOrOpera || hasWindowChrome
 }
