@@ -10,7 +10,7 @@ type ClientProperties struct {
 	Languages []string `json:"languages"`
 	Plugins   []string `json:"plugins"`
 	Window    []string `json:"custom_window"`
-	UA        string   `json:"ua"`
+	UserAgent string   `json:"ua"`
 }
 
 type Analyzer struct{}
@@ -24,7 +24,7 @@ func NewAnalyzer() *Analyzer {
 func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 	// TODO: Add more checks here
 	return a.analyzeLanguages(properties.Languages) &&
-		a.analyzePlugins(properties.Plugins, properties.UA) &&
+		a.analyzePlugins(properties.Plugins, properties.UserAgent) &&
 		a.analyzeWindow(properties.Window)
 }
 
