@@ -1,6 +1,8 @@
 package analyzer
 
-import "strings"
+import (
+	"strings"
+)
 
 const chromeDriverPrefix = "cdc_"
 
@@ -8,6 +10,7 @@ type ClientProperties struct {
 	Languages []string `json:"languages"`
 	Plugins   []string `json:"plugins"`
 	Window    []string `json:"custom_window"`
+	UserAgent string   `json:"ua"`
 	Webdriver bool     `json:"webdriver"`
 }
 
@@ -23,7 +26,7 @@ func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 	// TODO: Add more checks here
 
 	return a.analyzeLanguages(properties.Languages) &&
-		a.analyzePlugins(properties.Plugins) &&
+		a.analyzePlugins(properties.Plugins, properties.UserAgent) &&
 		a.analyzeWindow(properties.Window) &&
 		a.analyzeWebdriver(properties.Webdriver)
 }
@@ -42,9 +45,12 @@ func (a *Analyzer) analyzeLanguages(languages []string) bool {
 
 // analyzePlugins checks installed plugins
 // If no plugins available in browser - possibly bot
-// TODO: Check additionally for firefox browser: in firefox no plugins can be normal
-func (a *Analyzer) analyzePlugins(plugins []string) bool {
-	return len(plugins) != 0
+func (a *Analyzer) analyzePlugins(plugins []string, ua string) bool {
+
+	// In Firefox-like browsers no plugins can be normal
+	isGecko := strings.Contains(ua, "Gecko/")
+
+	return isGecko || len(plugins) != 0
 }
 
 // analyzeWindow checks window environment

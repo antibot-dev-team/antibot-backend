@@ -27,7 +27,6 @@ type analyzeResponse struct {
 
 type analyzeRequest struct {
 	// TODO: Think about request format
-	UserAgent  string                    `json:"ua"`
 	Properties analyzer.ClientProperties `json:"properties"`
 }
 
