@@ -12,6 +12,7 @@ type ClientProperties struct {
 	Window          []string `json:"custom_window"`
 	UserAgent       string   `json:"ua"`
 	HasWindowChrome bool     `json:"has_window_chrome"`
+	Webdriver       bool     `json:"webdriver"`
 }
 
 type Analyzer struct{}
@@ -24,10 +25,18 @@ func NewAnalyzer() *Analyzer {
 // Returns false if properties are invalid, or true otherwise
 func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 	// TODO: Add more checks here
+
 	return a.analyzeLanguages(properties.Languages) &&
 		a.analyzePlugins(properties.Plugins, properties.UserAgent) &&
 		a.analyzeWindow(properties.Window) &&
-		a.analyzeWindowChrome(properties.HasWindowChrome, properties.UserAgent)
+		a.analyzeWindowChrome(properties.HasWindowChrome, properties.UserAgent) &&
+		a.analyzeWebdriver(properties.Webdriver)
+}
+
+// analyzeWebdriver checks navigator.webdriver property value
+// If navigator.webdriver == True - possibly bot
+func (a *Analyzer) analyzeWebdriver(webdriver bool) bool {
+	return !webdriver
 }
 
 // analyzeLanguages checks available languages
