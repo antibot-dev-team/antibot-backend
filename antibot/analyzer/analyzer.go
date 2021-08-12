@@ -1,8 +1,6 @@
 package analyzer
 
-import (
-	"strings"
-)
+import "strings"
 
 const chromeDriverPrefix = "cdc_"
 
@@ -73,8 +71,10 @@ func (a *Analyzer) analyzeWindow(window []string) bool {
 func (a *Analyzer) analyzeWindowChrome(hasWindowChrome bool, ua string) bool {
 	// TODO: check if window.chrome is present in Chrome on iOS. If so, check UA for "CriOS" substring.
 
-	isChromeOrOpera := strings.Contains(ua, "Chrome") || strings.Contains(ua, "Chromium")
-	isChromeOrOpera = isChromeOrOpera || strings.Contains(ua, "Opera") || strings.Contains(ua, "OPR")
+	ua = strings.ToLower(ua)
+
+	isChromeOrOpera := strings.Contains(ua, "chrome") || strings.Contains(ua, "chromium")
+	isChromeOrOpera = isChromeOrOpera || strings.Contains(ua, "opera") || strings.Contains(ua, "opr")
 
 	return !isChromeOrOpera || hasWindowChrome
 }
