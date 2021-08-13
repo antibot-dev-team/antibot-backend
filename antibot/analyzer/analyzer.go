@@ -5,12 +5,13 @@ import "strings"
 const chromeDriverPrefix = "cdc_"
 
 type ClientProperties struct {
-	Languages       []string `json:"languages"`
-	Plugins         []string `json:"plugins"`
-	Window          []string `json:"custom_window"`
-	UserAgent       string   `json:"ua"`
-	HasWindowChrome bool     `json:"has_window_chrome"`
-	Webdriver       bool     `json:"webdriver"`
+	Languages         []string `json:"languages"`
+	Plugins           []string `json:"plugins"`
+	Window            []string `json:"custom_window"`
+	UserAgent         string   `json:"ua"`
+	HasWindowChrome   bool     `json:"has_window_chrome"`
+	Webdriver         bool     `json:"webdriver"`
+	InconsistentPerms bool     `json:"inconsistent_permissions"`
 }
 
 type Analyzer struct{}
@@ -28,7 +29,8 @@ func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 		a.analyzePlugins(properties.Plugins, properties.UserAgent) &&
 		a.analyzeWindow(properties.Window) &&
 		a.analyzeWindowChrome(properties.HasWindowChrome, properties.UserAgent) &&
-		a.analyzeWebdriver(properties.Webdriver)
+		a.analyzeWebdriver(properties.Webdriver) &&
+		a.analyzePermissions(properties.InconsistentPerms)
 }
 
 // analyzeWebdriver checks navigator.webdriver property value
@@ -77,4 +79,10 @@ func (a *Analyzer) analyzeWindowChrome(hasWindowChrome bool, ua string) bool {
 	isChromeOrOpera = isChromeOrOpera || strings.Contains(ua, "opera") || strings.Contains(ua, "opr")
 
 	return !isChromeOrOpera || hasWindowChrome
+}
+
+// analyzePermissions checks if permissions are working as intended.
+// If permissions query leads to contradictory results - possibly bot.
+func (a *Analyzer) analyzePermissions(inconsistentPerms bool) bool {
+	return !inconsistentPerms
 }
