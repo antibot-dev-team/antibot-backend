@@ -11,7 +11,7 @@ type ClientProperties struct {
 	UserAgent         string   `json:"ua"`
 	HasWindowChrome   bool     `json:"has_window_chrome"`
 	Webdriver         bool     `json:"webdriver"`
-	InconsistentPerms bool     `json:"inconsistent_permissions"`
+	ConsistentPerms   bool     `json:"consistent_permissions"`
 }
 
 type Analyzer struct{}
@@ -30,7 +30,7 @@ func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 		a.analyzeWindow(properties.Window) &&
 		a.analyzeWindowChrome(properties.HasWindowChrome, properties.UserAgent) &&
 		a.analyzeWebdriver(properties.Webdriver) &&
-		a.analyzePermissions(properties.InconsistentPerms)
+		a.analyzePermissions(properties.ConsistentPerms)
 }
 
 // analyzeWebdriver checks navigator.webdriver property value
@@ -83,6 +83,6 @@ func (a *Analyzer) analyzeWindowChrome(hasWindowChrome bool, ua string) bool {
 
 // analyzePermissions checks if permissions are working as intended.
 // If permissions query leads to contradictory results - possibly bot.
-func (a *Analyzer) analyzePermissions(inconsistentPerms bool) bool {
-	return !inconsistentPerms
+func (a *Analyzer) analyzePermissions(consistentPerms bool) bool {
+	return consistentPerms
 }
