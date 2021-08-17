@@ -96,14 +96,14 @@ func (a *Analyzer) analyzePermissions(consistentPerms bool) bool {
 }
 
 // analyzeEvalLength checks if browser specified in UserAgent is consistent with value of eval.toString().length
-// If it is not - possibly dishonest client.
+// If it is inconsistent - possibly dishonest client.
 func (a *Analyzer) analyzeEvalLength(UserAgent string, evalLength int) bool {
 	// Browser -> evalLength
 	BrowserToLength := map[string]int{
-		"Firefox": 37,
-		"Safari": 37,
-		"Chrome": 33,
-		"Opera": 33,
+		"Firefox":           37,
+		"Safari":            37,
+		"Chrome":            33,
+		"Opera":             33,
 		"Internet Explorer": 39,
 	}
 
@@ -123,7 +123,7 @@ func (a *Analyzer) analyzeEvalLength(UserAgent string, evalLength int) bool {
 }
 
 // analyzeProductSub checks if browser specified in UserAgent is consistent with navigator.productSub
-// If it is bot - possibly dishonest client.
+// If it is inconsistent - possibly dishonest client.
 func (a *Analyzer) analyzeProductSub(UserAgent, productSub string) bool {
 	// Safari, Chrome and Opera always have this productSub
 	chromeBuildNumber := "20030107"
