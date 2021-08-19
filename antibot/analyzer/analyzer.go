@@ -1,17 +1,23 @@
 package analyzer
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/mileusna/useragent"
+)
 
 const chromeDriverPrefix = "cdc_"
 
 type ClientProperties struct {
-	Languages         []string `json:"languages"`
-	Plugins           []string `json:"plugins"`
-	Window            []string `json:"custom_window"`
-	UserAgent         string   `json:"ua"`
-	HasWindowChrome   bool     `json:"has_window_chrome"`
-	Webdriver         bool     `json:"webdriver"`
-	ConsistentPerms   bool     `json:"consistent_permissions"`
+	Languages       []string `json:"languages"`
+	Plugins         []string `json:"plugins"`
+	Window          []string `json:"custom_window"`
+	UserAgent       string   `json:"ua"`
+	HasWindowChrome bool     `json:"has_window_chrome"`
+	Webdriver       bool     `json:"webdriver"`
+	ConsistentPerms bool     `json:"consistent_permissions"`
+	EvalLength      int      `json:"eval_length"`
+	ProductSub      string   `json:"product_sub"`
 }
 
 type Analyzer struct{}
@@ -30,7 +36,9 @@ func (a *Analyzer) AnalyzeProperties(properties ClientProperties) bool {
 		a.analyzeWindow(properties.Window) &&
 		a.analyzeWindowChrome(properties.HasWindowChrome, properties.UserAgent) &&
 		a.analyzeWebdriver(properties.Webdriver) &&
-		a.analyzePermissions(properties.ConsistentPerms)
+		a.analyzePermissions(properties.ConsistentPerms) &&
+		a.analyzeEvalLength(properties.UserAgent, properties.EvalLength) &&
+		a.analyzeProductSub(properties.UserAgent, properties.ProductSub)
 }
 
 // analyzeWebdriver checks navigator.webdriver property value
@@ -85,4 +93,49 @@ func (a *Analyzer) analyzeWindowChrome(hasWindowChrome bool, ua string) bool {
 // If permissions query leads to contradictory results - possibly bot.
 func (a *Analyzer) analyzePermissions(consistentPerms bool) bool {
 	return consistentPerms
+}
+
+// analyzeEvalLength checks if browser specified in UserAgent is consistent with value of eval.toString().length
+// If it is inconsistent - possibly dishonest client.
+func (a *Analyzer) analyzeEvalLength(UserAgent string, evalLength int) bool {
+	// Browser -> evalLength
+	BrowserToLength := map[string]int{
+		"Firefox":           37,
+		"Safari":            37,
+		"Chrome":            33,
+		"Opera":             33,
+		"Internet Explorer": 39,
+	}
+
+	client := ua.Parse(UserAgent)
+	usualLength, ok := BrowserToLength[client.Name]
+
+	// If evalLength for given browser is unknown - consider client honest
+	if !ok {
+		return true
+	}
+
+	if usualLength != evalLength {
+		return false
+	}
+
+	return true
+}
+
+// analyzeProductSub checks if browser specified in UserAgent is consistent with navigator.productSub
+// If it is inconsistent - possibly dishonest client.
+func (a *Analyzer) analyzeProductSub(UserAgent, productSub string) bool {
+	// Safari, Chrome and Opera always have this productSub
+	chromeBuildNumber := "20030107"
+
+	client := ua.Parse(UserAgent)
+	browser := client.Name
+
+	if browser == "Opera" || browser == "Chrome" || browser == "Safari" {
+		if productSub != chromeBuildNumber {
+			return false
+		}
+	}
+
+	return true
 }
