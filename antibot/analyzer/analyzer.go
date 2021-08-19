@@ -108,10 +108,10 @@ func (a *Analyzer) analyzeEvalLength(UserAgent string, evalLength int) bool {
 	}
 
 	client := ua.Parse(UserAgent)
-	usualLength := BrowserToLength[client.Name]
+	usualLength, ok := BrowserToLength[client.Name]
 
-	// If evalLength for given browser is unknown, return true
-	if usualLength == 0 {
+	// If evalLength for given browser is unknown - consider client honest
+	if !ok {
 		return true
 	}
 
